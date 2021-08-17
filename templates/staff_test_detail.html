@@ -1,0 +1,167 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="container page-body">
+    <div class="col-md-5 col-md-offset-1" role="main">
+        <div id="content">
+            <p>{{test.get_style_display}}</p><br />
+                                    <select id="subject" onchange="change()" name="subject">
+            <option value="" disabled selected hidden>--请选择知识方向--</option>
+            {#<option value="all">all</option>#}
+                {% for i in subject_list %}
+            <option value="{{i.id}}"  {% if i.id == subject_re %}selected {% endif %}>{{i.subject}}</option>
+                {% endfor %}
+            </select>
+
+            <select id="point" name="point" >
+                {% for i in point_list %}
+            <option value="{{i}}" {% if i == point_re %}selected {% endif %}>{{i}}</option>
+                {% endfor %}
+            </select>
+
+            <p>题目描述</p>
+            <textarea id="desc" >{{test.desc}}</textarea>
+            <p>难度</p>
+            <select id="difficulty" name="difficulty">
+
+            <option value="1" {% if test.difficulty == "1" %}selected {% endif %}>简单</option>
+                <option value="2" {% if test.difficulty == "2" %}selected {% endif %}>中等</option>
+                <option value="3" {% if test.difficulty == "3" %}selected {% endif %}>困难</option>
+            </select>
+            <p>选项</p>
+
+                <p>A：<input type="text"  name="select" value="{{test.select_a}}"></p>
+                <p>B：<input type="text"  name="select" value="{{test.select_b}}"></p>
+                <p>C：<input type="text"  name="select" value="{{test.select_c}}"></p>
+                <p>D：<input type="text"  name="select" value="{{test.select_d}}"></p>
+
+            <p>答案</p>
+                <p>
+                    <input type="radio" name="select_answer" value="A" id="select_answer" {% if test.answer == "A" %}checked{% endif %}>A
+                    <input type="radio" name="select_answer" value="B" id="select_answer" {% if test.answer == "B" %}checked{% endif %}>B
+                    <input type="radio" name="select_answer" value="C" id="select_answer" {% if test.answer == "C" %}checked{% endif %}>C
+                    <input type="radio" name="select_answer" value="D"id="select_answer" {% if test.answer == "D" %}checked{% endif %}>D
+                </p>
+
+
+
+            <p>解析</p>
+            <textarea id="explain" >{{test.explain}}</textarea>
+            <p> </p>
+
+            <button onclick="verify_delete({{test.id}})"> 删除</button>
+            <button onclick="verify_use({{test.id}})"> 启用</button>
+        </div>
+       </div>
+
+
+    {% if test.status == "2"%}
+    <div>
+
+        <p>异议内容</p>
+        {% for i in objection_list%}
+        <p>{{i.user.username}}</p>
+        <p>{{i.content}}</p>
+        {% endfor %}
+
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+{% block js_block%}
+<script>
+        function change() {
+        var subject = document.getElementById("subject").value;
+     $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxchangesubject' %}",
+                data: {'subject':subject},
+                async: true,
+    traditional:true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+    var point=document.getElementById("point");
+    var content="";
+                    if (data.res == 1) {
+      for(let i=0;i<data.list.length;i++){
+         content+="<option value='"+data.list[i].point+"'>"+data.list[i].point+"</option>";
+      } 
+    point.innerHTML=content;
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+
+    function verify_delete(test_id, ty){
+       $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxverifydelete' %}",
+                data: {'test_id':test_id},
+                async: true,
+    traditional:true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+alert("成功")
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });  
+    }
+
+
+    function verify_use(test_id) {
+    var desc=document.getElementById("desc").value;
+    var explain=document.getElementById("explain").value;
+    var difficulty=document.getElementById("difficulty").value;
+    var select=new Array();
+    var select_1=document.getElementsByName("select");
+      for(let i=0;i<select_1.length;i++){
+         select[i]=select_1[i].value;
+
+      }
+    var select_answer=$('input[type=radio][name=select_answer]:checked').val();
+    var subject=document.getElementById("subject").value;
+    var point=document.getElementById("point").value;
+    if (point == ""){
+    alert("请选择知识点");
+    }
+    else{
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxverifyuse' %}",
+                data: {'test_id':test_id, 'desc':desc, 'selection':select, 'explain':explain, 'difficulty':difficulty,'select_answer':select_answer, 'subject':subject, 'point':point},
+                async: true,
+    traditional:true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+alert("成功")
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+    }
+    </script>
+{% endblock %}

@@ -1,0 +1,323 @@
+﻿{% extends 'base.html' %}
+
+{%block content%}
+<h2>总题号：{{id}}</h2>
+<button onclick="change_page('previous', {{id}}, {{style}})">上一题</button> <button onclick="change_page('next', {{id}}, {{style}})">下一题</button>
+     <div name="a" id="a1" style="width:500px;">
+
+        <p>{{test.1}}</p>
+
+        {% if test.0 == '1' %}
+            {% for j in test.4%}
+                            <p>{{j.0}}：{{j.1}}</p>
+            {% endfor%}
+    <p>   默认看题模式：                     
+        <select id="habit" onchange="change_habit()" name="habit">
+            <option value="1" {% if habit == 1%}selected {% endif %}>做题</option>
+                <option value="2" {% if habit == 2%}selected {% endif %}>背题</option></select>
+         <button onclick="see_answer()">查看答案 </button>
+         </p>
+         <div id="answer" {% if habit == 1 %}style="display:none" {% endif %}>
+        <p>正确答案：{% for m in test.2 %}{{m}}  {%endfor %}</p>
+        <p>解析：</p>
+        <p>{{test.3}}</p>
+             </div>
+
+        {% elif test.0 == '2' %}
+            {% for j in test.4%}
+                            <p>{{j.0}}：{{j.1}}</p>
+            {% endfor%}
+    <p>   默认看题模式：                     
+        <select id="habit" onchange="change_habit()" name="habit">
+            <option value="1" {% if habit == 1%}selected {% endif %}>做题</option>
+                <option value="2" {% if habit == 2%}selected {% endif %}>背题</option></select>
+         <button onclick="see_answer()">查看答案 </button>
+         </p>
+         <div id="answer" {% if habit == 1 %}style="display:none" {% endif %}>
+        <p>正确答案：{% for m in test.2%}{{m}}  {%endfor %}</p>
+        <p>解析：</p>
+        <p>{{test.3}}</p>
+             </div>
+
+        {% elif test.0 == '3' %}
+            {% for j in test.4%}
+                            <p>{{j.0}}：{{j.1}}</p>
+            {% endfor%}
+    <p>   默认看题模式：                     
+        <select id="habit" onchange="change_habit()" name="habit">
+            <option value="1" {% if habit == 1%}selected {% endif %}>做题</option>
+                <option value="2" {% if habit == 2%}selected {% endif %}>背题</option></select>
+         <button onclick="see_answer()">查看答案 </button>
+         </p>
+         <div id="answer" {% if habit == 1 %}style="display:none" {% endif %}>
+        <p>正确答案：{% for m in test.2%}{{m}}  {%endfor %}</p>
+        <p>解析：</p>
+        <p>{{test.3}}</p>
+             </div>
+
+        {% elif test.0 == '4' %}
+    <p>   默认看题模式：                     
+        <select id="habit" onchange="change_habit()" name="habit">
+            <option value="1" {% if habit == 1%}selected {% endif %}>做题</option>
+                <option value="2" {% if habit == 2%}selected {% endif %}>背题</option></select>
+         <button onclick="see_answer()">查看答案 </button>
+         </p>
+         <div id="answer" {% if habit == 1 %}style="display:none" {% endif %}>
+        <p>正确答案：</p>
+            {% for j in test.4%}
+                            <p>{{j}} 其中之一</p>
+            {% endfor%}
+        <p>解析：</p>
+        <p>{{test.3}}</p>
+             </div>
+        {% endif %}
+    <p></p>
+<button onclick="objection()" id="delete_submit">异议</button>
+{% if style == 3 %}<button onclick="delete_submit({{id}})" id="delete_submit">删除提交</button>{% endif %}
+{% if style == 1%}<button onclick="delete_test({{id}})" id="delete_test">删除此条记录</button>{% endif %}
+{% if is_true %}<p>{% if is_true == 1%}已做对{%else%}未做对{%endif%}</p>{% endif %}
+{% if is_false %}<p>{% if is_false == 1%}曾做错 <button onclick="delete_wrong({{id}})" id="delete_wrong">从错题集中删除</button>{%else%}未做错{%endif%}</p>{% endif %}
+<p>{% if is_favourite == 1%} <button onclick="delete_favourite({{id}})" id="delete_favourite">已收藏</button>{%else%}<button onclick="add_favourite({{id}})" id="add_favourite">未收藏</button>{%endif%}</p>
+    </div>
+
+
+{% endblock %}
+
+{% block js_block%}
+<script>
+    function objection_submit(){
+    var content = document.getElementById("objection_content").value;
+           $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url '' %}",
+                data: {'test_id':{{id}}, 'content': content},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+alert("成功")
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+    }
+
+    function objection(){
+layer.open({
+            type: 1, 
+    title: '异议理由',
+    area: ['350px', '250px'],
+  content: "<div><textarea id='objection_content' ></textarea></div><div style='float: right;'><button type='button' class='btn btn-default' onclick='objection_submit()'>提交</button></div>"
+});  
+
+    }
+
+    function getQueryVariable(variable)
+{
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == variable){return pair[1];}
+       }
+       return(false);
+}
+
+    function change_page(pn, test_id, ty){
+    var id= getQueryVariable("id");
+    var subject= getQueryVariable("subject");
+    var point=getQueryVariable("point");
+    var difficulty= getQueryVariable("difficulty");
+    var status = getQueryVariable("status");
+    var style=getQueryVariable("style");
+    var url = window.location.href;
+         $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxchangepage' %}",
+                data: {'id': id, 'pn':pn, 'url':url,'subject':subject,'point':point,'difficulty':difficulty,'test_id':test_id, 'status':status, 'style':style, 'ty':ty},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+            window.location.href=data.url;
+                },
+            });
+    
+    }
+
+    function see_answer(){
+     document.getElementById("answer").style.display="";
+
+    }
+
+
+    function change_habit(){
+    var habit = document.getElementById("habit").value;
+     $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxhabit' %}",
+                data: {'habit': habit},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                window.location.reload();
+
+                    } else {
+                        alert("失败");
+                    }
+                },
+            });
+    }
+
+
+
+
+
+    function delete_test(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxwrongtest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id, type:"delete_test"},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('delete_test');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<p>已删除</p>";
+                         m.parentNode.replaceChild(newNode,m);
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+
+        function delete_wrong(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxwrongtest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id, type:"delete_wrong"},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('delete_wrong');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<p>已删除</p>";
+                         m.parentNode.replaceChild(newNode,m);
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+
+        function delete_favourite(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxfavouritetest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id, type:"delete_favourite"},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('delete_favourite');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<button onclick='add_favourite("+data.id+");' id='add_favourite'>未收藏</button>";
+                         m.parentNode.replaceChild(newNode,m);
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+
+        function add_favourite(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxfavouritetest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id, type:"add_favourite"},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('add_favourite');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<button onclick='delete_favourite("+data.id+");' id='delete_favourite'>已收藏</button>";
+                         m.parentNode.replaceChild(newNode,m);
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+
+     function delete_submit(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxsubmittest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id,},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('delete_submit');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<p>已删除</p>";
+                         m.parentNode.replaceChild(newNode,m);
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+  </script>
+{% endblock %}

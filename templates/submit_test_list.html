@@ -1,0 +1,144 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="container page-body">
+<div class="col-md-1 col-md-offset-1" role="main">
+    <ul class="list-group">
+  <li class="list-group-item" >用户信息</li>
+  
+  <li class="list-group-item">收藏集</li>
+<li class="list-group-item" >做题记录</li>
+  <li class="list-group-item">上传题目</li>
+      <li class="list-group-item" style="color:darkmagenta">已上传</li>
+  <li class="list-group-item">
+    <span class="badge">10</span>
+    用户消息
+  </li>
+</ul>
+</div>
+
+    <div class="col-md-5 col-md-offset-1" role="main">
+        <div>
+                        <select id="subject" onchange="change()" name="subject">
+            <option value="" disabled selected hidden>--请选择知识方向(默认全部)--</option>
+                <option value="">全选</option>
+            {#<option value="all">all</option>#}
+                {% for i in subject_list %}
+            <option value="{{i.id}}"  {% if i.id == subject_re %}selected {% endif %}>{{i.subject}}</option>
+                {% endfor %}
+            </select>
+
+            <select id="point" name="point" onchange="change()">
+            <option value="" disabled selected hidden>--请选择知识点(默认全部)--</option>
+                <option value="">全选</option>
+            {#<option value="all">all</option>#}
+                {% for i in point_list %}
+            <option value="{{i}}" {% if i == point_re %}selected {% endif %}>{{i}}</option>
+                {% endfor %}
+            {#<option value="all">all</option>#}
+            </select>
+
+            <select id="difficulty" name="difficulty" onchange="change()">
+                <option value="" disabled selected hidden>--请选择难度(默认全部)--</option>
+            <option value="1" {% if   difficulty_re == '1'  %}selected {% endif %}>简单</option>
+            <option value="2" {% if   difficulty_re == '2'  %}selected {% endif %}>中等</option>
+            <option value="3" {% if   difficulty_re == '3'  %}selected {% endif %}>困难</option>
+            </select>
+
+            <select id="status" name="status" onchange="change()">
+                <option value="" disabled selected hidden>--请选择状态(默认全部)--</option>
+                <option value="" >全部</option>
+            <option value="1" {% if   status_re == '1'  %}selected {% endif %}>待审核</option>
+            <option value="2" {% if   status_re == '2'  %}selected {% endif %}>异议退回</option>
+            <option value="3" {% if   status_re == '3'  %}selected {% endif %}>启用</option>
+            <option value="4" {% if   status_re == '4'  %}selected {% endif %}>仅自己可见</option>
+            <option value="5" {% if   status_re == '5'  %}selected {% endif %}>废弃</option>
+            </select>
+
+            <select id="style" name="style" onchange="change()">
+                <option value="" disabled selected hidden>--请选择类型(默认全部)--</option>
+                <option value="" >全部</option>
+            <option value="1" {% if   status_re == '1'  %}selected {% endif %}>单选</option>
+            <option value="2" {% if   status_re == '2'  %}selected {% endif %}>多选</option>
+            <option value="3" {% if   status_re == '3'  %}selected {% endif %}>判断</option>
+            <option value="4" {% if   status_re == '4'  %}selected {% endif %}>填空</option>
+            </select>
+
+       </div>
+        <div>
+                {% for i in test_list.object_list %}
+                <div>
+                    <p>{{i.0.id}}</p>
+                    <a href="javascript:void(0);" onclick="jump({{i.1}})"> {{i.0.desc|truncatewords:20}}</a>
+                    <p>{{i.0.get_difficulty_display}}</p>
+                    <p>{{i.0.subject_point}}</p>
+                    <p>{{i.0.get_status_display}}</p>
+                    <button onclick="delete_submit({{i.0.id}})" id="delete_submit">删除提交</button>
+
+                </div>
+                {% endfor %}
+            </div>
+            <div id="pagination">
+                {{test_list.render}}
+
+            </div>
+            </div>
+</div>
+{% endblock %}
+                
+{% block js_block%}
+<script>
+
+    function change() {
+        var subject = document.getElementById("subject").value;
+        var point = document.getElementById("point").value;
+        var difficulty = document.getElementById("difficulty").value;
+    var status = document.getElementById("status").value;
+    var style=document.getElementById("style").value;
+        var window_url=window.location.href .replace(/\?.*/,'')
+        var url = window_url+"?" + "subject=" + subject + "&" + "point=" + point + "&" + "difficulty=" + difficulty+"&"+"status="+status+"&"+"style="+style  ;
+        window.open(url, "_self")
+    }
+
+    function jump(id) {
+        var subject = document.getElementById("subject").value;
+        var point = document.getElementById("point").value;
+        var difficulty = document.getElementById("difficulty").value;
+    var status = document.getElementById("status").value;
+    var style=document.getElementById("style").value;
+        var window_url=window.location.href .replace(/\?.*/,'');
+
+        var url = window_url+"?" + "subject=" + subject + "&" + "point=" + point + "&" + "difficulty=" + difficulty+"&"+"status="+status+"&"+"style="+style+"&"+"id="+id;
+        window.open(url, "_self")
+    }
+
+    function delete_submit(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxsubmittest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id,},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('delete_submit');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<p>已删除</p>";
+                         m.parentNode.replaceChild(newNode,m);
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+
+
+  </script>
+{% endblock %}

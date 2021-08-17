@@ -1,0 +1,64 @@
+﻿{% load static %}
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta chraset="utf-8" />
+    <title>TestWareHouse1</title>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+<script type="text/javascript"  src='/static/js/jquery-1.7.2.js' charset="UTF-8"></script>
+    <script src="{% static 'layui/layui.js' %}"></script>
+<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+<link href="/static/bootstrap/css/bootstrap-theme.css" rel="stylesheet">
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+
+        <div class="container page-header">
+            {% block title%}
+            {% endblock %}
+
+            {% block user_title%}
+            <div class="col-md-2 col-md-offset-10" >
+    {% if request.user.is_authenticated %}
+    <div class="btn-group" role="group" aria-label="..." id="login">
+          <span>{{request.user.username}}</span>
+          <a  href="{% url 'logout' %}">退出</a>
+        <a  href="{% url 'userhome' %}">用户中心</a>
+      </div>
+{% else %}
+
+
+    <div class="btn-group" role="group" aria-label="..." id="logout">
+<a  href="{% url 'login' %}">登录</a>
+<a  href="{% url 'register_username' %}">注册</a>
+        </div>
+{% endif %}
+</div>
+    </div>
+{% endblock%}
+
+{% block content %}
+    <div class="container page-body">
+        <div class="col-md-9 col-md-offset-3" role="main">
+            <div class="boby-main">
+                <div>
+            {% for i in nums%}
+            <p>HELLOWORLD</p>
+            {% endfor %}
+                    </div>
+        </div>
+            </div>
+    </div>
+{% endblock %}
+{% block js_block%}
+{% endblock %}
+</body>
+
+
+</html>

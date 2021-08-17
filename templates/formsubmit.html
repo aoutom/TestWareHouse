@@ -1,0 +1,66 @@
+﻿{% extends 'base.html' %}
+
+
+
+{%block content%}
+
+        <div class="container page-body">
+        <div class="col-md-9 col-md-offset-2" role="main">
+<form action="{% url 'formsubmit' %}" method="post">
+    {% for i in content%}
+    {% ifequal i 0 %}
+    <div name="a" id="a1" style="width:500px"><p>6月23日，中共中央总书记、国家主席、中央军委主席习近平来到北京航天飞行控制中心，与神舟十二号航天员通话。</p>
+    {% else%}
+    <div name="a" id="a1" style="width:500px;display:none"><p>6月23日，中共中央总书记、国家主席、中央军委主席习近平来到北京航天飞行控制中心，与神舟十二号航天员通话。</p>
+        {%endifequal%}                
+                        <input type="radio" name="t{{i}}" id="color" value="1"/>A: 中共中央总书记<br />
+                        <input type="radio" name="t{{i}}" id="color" value="2"/>B: 国家主席<br />
+                        <input type="radio" name="t{{i}}" id="color" value="3"/>C: 中央军委主席<br />
+                        <input type="radio" name="t{{i}}" id="color" value="4"/>D: 全部<br />
+    <p></p>
+    </div>
+{% endfor %}
+    
+
+    <nav aria-label="Page navigation">
+  <ul class="pagination">
+    <li>
+      <a href="#" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+      {% for i in content%}
+    <li><a href="javascript:void(0);" id="but1" onclick="h({{i}})">{{i|add:1}}</a></li>
+
+      {% endfor %}
+    <li>
+      <a href="#" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+                        <input type="submit" value="提交" />
+                        {% csrf_token %}
+                    </form>
+    
+
+</div>
+            </div>
+{% endblock %}
+
+
+{% block js_block%}
+       <script type="text/javascript">
+            function h(idt){
+
+                var x = document.getElementsByName("a");
+                for(var i=0;i<x.length;i++) {
+                    x[i].style.display = "none";
+                }
+                x[idt].style.display = "";
+
+    }
+    </script>
+
+{% endblock %}

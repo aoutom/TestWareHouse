@@ -1,0 +1,157 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="container page-body">
+<div class="col-md-1 col-md-offset-1" role="main">
+    <ul class="list-group">
+  <li class="list-group-item" >用户信息</li>
+  
+  <li class="list-group-item">收藏集</li>
+<li class="list-group-item" style="color:darkmagenta">做题记录</li>
+  <li class="list-group-item">上传题目</li>
+    
+  <li class="list-group-item">
+    <span class="badge">10</span>
+    用户消息
+  </li>
+</ul>
+</div>
+
+    <div class="col-md-5 col-md-offset-1" role="main">
+        <div>
+                        <select id="subject" onchange="change()" name="subject">
+            <option value="" disabled selected hidden>--请选择知识方向(默认全部)--</option>
+                <option value="">全选</option>
+            {#<option value="all">all</option>#}
+                {% for i in subject_list %}
+            <option value="{{i.id}}"  {% if i.id == subject_re %}selected {% endif %}>{{i.subject}}</option>
+                {% endfor %}
+            </select>
+
+            <select id="point" name="point" onchange="change()">
+            <option value="" disabled selected hidden>--请选择知识点(默认全部)--</option>
+                <option value="">全选</option>
+            {#<option value="all">all</option>#}
+                {% for i in point_list %}
+            <option value="{{i}}" {% if i == point_re %}selected {% endif %}>{{i}}</option>
+                {% endfor %}
+            {#<option value="all">all</option>#}
+            </select>
+
+            <select id="difficulty" name="difficulty" onchange="change()">
+                <option value="" disabled selected hidden>--请选择难度(默认全部)--</option>
+            <option value="1" {% if   difficulty_re == '1'  %}selected {% endif %}>简单</option>
+            <option value="2" {% if   difficulty_re == '2'  %}selected {% endif %}>中等</option>
+            <option value="3" {% if   difficulty_re == '3'  %}selected {% endif %}>困难</option>
+            </select>
+
+            <select id="istf" name="istf" onchange="change()">
+                <option value="" disabled selected hidden>--请选择类型(默认全部)--</option>
+                <option value="00" >全部</option>
+            <option value="10" {% if   istf_re == '10'  %}selected {% endif %}>正确</option>
+            <option value="01" {% if   istf_re == '01'  %}selected {% endif %}>错题</option>
+            <option value="11" {% if   istf_re == '11'  %}selected {% endif %}>即对过又错过</option>
+            </select>
+       </div>
+        <div>
+                {% for i in test_list.object_list %}
+                <div>
+                    <p>{{i.0.id}}</p>
+                    <a href="javascript:void(0);" onclick="jump({{i.3}})"> {{i.0.desc|truncatewords:20}}</a>
+                    <p>{{i.0.get_difficulty_display}}</p>
+                    <p>{{i.0.subject_point}}</p>
+                    <button onclick="delete_test({{i.0.id}})" id="delete_test">删除此条记录</button>
+                    <p>{% if i.1 == 1%}已做对{%else%}未做对{%endif%}</p>
+                    <p>{% if i.2 == 1%}曾做错 <button onclick="delete_wrong({{i.0.id}})" id="delete_wrong">从错题集中删除</button>{%else%}未做错{%endif%}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div id="pagination">
+                {{test_list.render}}
+
+            </div>
+            </div>
+</div>
+{% endblock %}
+                
+{% block js_block%}
+<script>
+
+    function change() {
+        var subject = document.getElementById("subject").value;
+        var point = document.getElementById("point").value;
+        var difficulty = document.getElementById("difficulty").value;
+        var istf = document.getElementById("istf").value;
+        var window_url=window.location.href .replace(/\?.*/,'')
+        var url = window_url+"?" + "subject=" + subject + "&" + "point=" + point + "&" + "difficulty=" + difficulty+"&"+"istf="+istf ;
+        window.open(url, "_self")
+    }
+
+    function jump(id) {
+        var subject = document.getElementById("subject").value;
+        var point = document.getElementById("point").value;
+        var difficulty = document.getElementById("difficulty").value;
+        var window_url=window.location.href .replace(/\?.*/,'');
+        var istf = document.getElementById("istf").value;
+        var url = window_url+"?" + "subject=" + subject + "&" + "point=" + point + "&" + "difficulty=" + difficulty+"&"+"istf="+istf+"&"+"id="+id;
+        window.open(url, "_self")
+    }
+
+    function delete_test(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxwrongtest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id, type:"delete_test"},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('delete_test');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<p>已删除</p>";
+                         m.parentNode.replaceChild(newNode,m);
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+
+        function delete_wrong(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxwrongtest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id, type:"delete_wrong"},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('delete_wrong');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<p>已删除</p>";
+                         m.parentNode.replaceChild(newNode,m);
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+  </script>
+{% endblock %}
+
+            
+

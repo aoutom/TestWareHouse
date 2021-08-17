@@ -1,0 +1,65 @@
+﻿{% extends 'base.html' %}
+
+{% block title%}
+<div class="col-md-6 ">
+        <h2>用户名注册</h2>
+        <h5><a href="{% url 'register_email'%}">转至邮箱注册</a></h5>
+        <h5><a href="{% url 'login'%}">转至登录</a></h5>
+    </div>
+{% endblock %}
+{% block user_title%}
+{% endblock %}
+
+{%block content%}
+    <div class="container page-body">
+        <div class="col-md-9 col-md-offset-4" role="main">
+            <div class="boby-main">
+                <div>
+                    <form action="{% url 'register_username' %}" method="post">
+                        <h4>用户名 (不能为空，不能为邮箱形式，长度至多20位): </h4><input type="text" name="username" value="{% if register_form.username.value %}{{register_form.username.value}}{% else %}{% endif %}"/>
+                        <h4>请输入密码 (长度至少6位，至多20位，必须包含数字、字母，不能使用其它字符): </h4><input type="password" name="password_1" value="{% if register_form.password_1.value %}{{register_form.password_1.value}}{% else %}{% endif %}"/>
+                        <h4>重新确认密码: </h4><input type="password" name="password_2"  value="{% if register_form.password_2.value %}{{register_form.password_2.value}}{% else %}{% endif %}"/>
+                        <h4>验证码: </h4>
+                        <div id="code">
+                                <input  type="text" id="captcha" name="captcha" />
+                                 <input id="hashkey" name="hashkey" type="hidden" value="{{hashkey}}" />
+                            <img id="code_img" class="weui-vcode-img" src="{{ imgage_url }}" width="120" height="40" onclick="change_hash()"/>
+                            </div>
+                        <p style="color:red">{% if msg %}{{msg}}{% else %}{% endif %}</p>
+                        <input type="submit" value="注册" />
+                        {% csrf_token %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        </div>
+{% endblock %}
+
+{% block js_block%}
+<script>
+
+
+
+function change_hash(){
+  $.ajax({
+                cache: false,
+                type: "GET",
+                url: "{% url 'ajax_code' %}",
+                async: true,
+                success: function (data) {
+
+                var hashkey=document.getElementById('hashkey');
+                var newhashkey=document.createElement("i");
+                newhashkey.innerHTML="<input id='hashkey' name='hashkey' type='hidden' value="+data.hashkey+" >";
+                hashkey.parentNode.replaceChild(newhashkey,hashkey);
+
+                var code_img=document.getElementById('code_img');
+                var newcode_img=document.createElement("j");
+                newcode_img.innerHTML="<img id='code_img' class='weui-vcode-img' src="+ data.imgage_url+" width='120' height='40' onclick='change_hash()'>";
+                code_img.parentNode.replaceChild(newcode_img,code_img);
+    
+    }   
+    })
+    };
+  </script>
+{% endblock %}
