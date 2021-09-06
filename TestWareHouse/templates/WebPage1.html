@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+ </head>
+ <body>
+ <!--    实现点击按钮显示一个div,页面上其他的内容全部隐藏。再点击返回按钮，div隐藏，页面上所有的内容再显示出来。-->
+
+    <article> 
+    <!---article是HTML5的一个元素标签-->
+
+
+        <hr />
+        <div class="div"> 
+        这里就是div的内容        
+        </div>   
+
+        <div name="a" id="a1" style="display:none">山东省地方1</div>
+        <div name="a" id="a2" style="display:none">山东省地方2</div>
+        <div name="a" id="a3" style="display:none">山东省地方3</div>
+        
+        <a  href="javascript:void(0);" id="but1" onclick="h(0)">1</a>
+        <a  href="javascript:void(0);" id="but2" onclick="h(1)">2</a>
+        <a href="javascript:void(0);"  id="but3" onclick="h(2)">3</a>
+        <hr />
+
+      
+        </article>
+
+
+
+        </body>
+        </html>
+
+       <script type="text/javascript">
+        //var btn = document.getElementById("but1");
+
+        //// 第一种 通过点击事件
+        //btn.onclick = function(){
+        //    alert("这是第一种点击方式");
+        //}
+            function h(idt){
+
+                var x = document.getElementsByName("a");
+                for(var i=0;i<x.length;i++) {
+                    x[i].style.display = "none";
+                }
+                x[idt].style.display = "";
+
+    }
+    </script>

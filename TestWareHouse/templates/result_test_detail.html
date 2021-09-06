@@ -1,0 +1,41 @@
+﻿{% extends 'base.html' %}
+
+{%block content%}
+<h2>题号：{{id|add:1}}</h2>
+     <div name="a" id="a1" style="width:500px;">
+
+        <p>{{test.1}}</p>
+        {% if test.0 == '1' %}
+            {% for j in test.4%}
+                            <p>{{j.0}}：{{j.1}}</p>
+            {% endfor%}
+        <p>正确答案：{% for m in test.2 %}{{m}}  {%endfor %}</p>
+        <p>解析：</p>
+        <p>{{test.3}}</p>
+        {% elif test.0 == '2' %}
+            {% for j in test.4%}
+                            <p>{{j.0}}：{{j.1}}</p>
+            {% endfor%}
+        <p>正确答案：{% for m in test.2%}{{m}}  {%endfor %}</p>
+        <p>解析：</p>
+        <p>{{test.3}}</p>
+        {% elif test.0 == '3' %}
+            {% for j in test.4%}
+                            <p>{{j.0}}：{{j.1}}</p>
+            {% endfor%}
+        <p>正确答案：{% for m in test.2%}{{m}}  {%endfor %}</p>
+        <p>解析：</p>
+        <p>{{i.3}}</p>
+        {% elif test.0 == '4' %}
+
+        <p>正确答案：</p>
+            {% for j in test.4%}
+                            <p>{{j}} 其中之一</p>
+            {% endfor%}
+        <p>解析：</p>
+        <p>{{i.3}}</p>
+        {% endif %}
+    <p></p>
+    </div>
+
+{% endblock %}

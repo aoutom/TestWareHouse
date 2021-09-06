@@ -1,0 +1,5 @@
+2021-07-23 21:42:57,985 sohu_login_test.py --> tearDown 20 INFO --> 测试用例执行成功
+2021-07-23 21:43:03,054 sohu_login_test.py --> tearDown 20 INFO --> 测试用例执行成功
+2021-07-23 21:43:08,634 sohu_login_test.py --> tearDown 20 INFO --> 测试用例执行成功
+2021-07-23 21:43:24,315 sohu_login_test.py --> tearDown 20 INFO --> 测试用例执行失败
+2021-07-23 21:43:29,915 sohu_login_test.py --> tearDown 20 INFO --> 测试用例执行成功

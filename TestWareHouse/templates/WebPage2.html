@@ -1,0 +1,47 @@
+﻿
+<html>
+<head>
+<title>js实现弹出提交表单</title><meta charset="utf-8">
+	
+</head>
+
+<body>
+    <div class="col-1">
+         <input type="button" class="my-btn-blue" value="新建" onclick="newFile()">
+    </div>
+
+    	
+	    {#<form>
+	        <p>文件名：<input type='text' id='create_name' /></p>
+	        <p>作&nbsp;&nbsp;者&nbsp;&nbsp;：<input type="text" id="create_author" /></p>
+	        <p>文&nbsp;&nbsp;种&nbsp;&nbsp;：<select id="create_type" >
+	                <option value ="总结报告">总结报告</option> 
+	                <option value ="辅助授课">辅助授课</option> 
+	                <option value ="其他">其他</option> 
+	                </select>
+	        </p>
+	        <div style="float: right;">
+		       <button class="my-btn-gray" ng-click="create_paper_cancel()">取消</button>
+		       <button class="my-btn-blue" ng-click="create_paper_save()">保存</button>
+		    </div>
+	    </form>#}
+
+
+</body>
+
+
+</html>
+<script src="../static/layui/layui.js"></script>
+<script>
+	function newFile() {
+		layer.open({
+  title: '在线调试'
+  ,content: "<form><p>文件名：<input type='text' id='create_name' /></p><div style='float: right;'><button class='my-btn-gray' onclick='create_paper_cancel()'>取消</button></div></form>"
+});  
+	};
+
+	function create_paper_cancel() {
+		alert("hao");
+	};
+
+</script>

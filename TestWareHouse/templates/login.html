@@ -1,0 +1,108 @@
+﻿{% extends 'base.html' %}
+
+{%block content%}
+    <div class="container page-body">
+        <div class="col-md-9 col-md-offset-4" role="main">
+            <div class="boby-main">
+                <div>
+                    <form action="{% url 'login' %}" method="post">
+                        <h3>用户名或邮箱: </h3><input type="text" name="username" value="{% if login_form.username.value %}{{login_form.username.value}}{% else %}{% endif %}" /><br />
+
+                        <h3>密码: </h3><input type="password" name="password" value="{% if register_form.password.value %}{{register_form.password.value}}{% else %}{% endif %}"/>
+                        <a href="javascript:void(0);" onclick="forgetpassword()">忘记密码</a>
+                        <br />
+                        <h3>验证码: </h3>
+                        <div id="code">
+                                <input  type="text" id="captcha" name="captcha" />
+                                 <input id="hashkey" name="hashkey" type="hidden" value="{{hashkey}}" />
+                            <img id="code_img" class="weui-vcode-img" src="{{ imgage_url }}" width="120" height="40" onclick="change_hash()"/>
+                            </div>
+
+                        <p style="color:red">{% if msg %}{{msg}}{% else %}{% endif %}</p>
+                        <input type="submit" value="登录" />
+                        {% csrf_token %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        </div>
+{% endblock %}
+
+{% block js_block%}
+<script>
+
+    function forgetpassword() {
+layer.open({
+            type: 1, 
+    title: '修改密码',
+    area: ['350px', '250px'],
+  content: "<form action='' method='post' id='forgetpasswordform'><div class='input-group'><span class='input-group-addon'>注册邮箱：</span><input type='text' class='form-control' aria-label='Amount (to the nearest dollar) ' id='forget_email'></div><br/><div class='input-group'><span class='input-group-addon'>新密码：</span><input type='text' class='form-control' aria-label='Amount (to the nearest dollar) ' id='forget_password_1'></div></br><div class='input-group'><span class='input-group-addon'>确认新密码：</span><input type='text' class='form-control' aria-label='Amount (to the nearest dollar) ' id='forget_password_2'></div><div style='float: right;'><button type='button' class='btn btn-default' onclick='forget_password()'>修改密码</button></div></form>"
+});  
+	};
+
+    function forget_password() {
+        var password_1 = document.getElementById('forget_password_1').value;
+        var password_2 = document.getElementById('forget_password_2').value;
+        var email=document.getElementById('forget_email').value
+        if (password_1 != password_2) {
+            alert('两次密码不一致！');
+        }
+        else {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'forget_password' %}",
+                data: {
+                        'password': password_1,
+                        'email':email,
+                    },
+                async: true,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1){
+                        alert("邮箱格式不正确");
+    }
+                    else if (data.res == 2){
+                        alert("密码格式不正确");
+    }
+                    else if (data.res == 3){
+                        alert("邮箱不存在");
+    }
+                    else if (data.res == 4){
+                        alert("邮箱验证码发送成功");
+    }
+    else{
+    alert("邮箱验证码发送失败请成功");
+    }
+                    },
+
+                    });
+        }
+    };
+
+function change_hash(){
+  $.ajax({
+                cache: false,
+                type: "GET",
+                url: "{% url 'ajax_code' %}",
+                async: true,
+                success: function (data) {
+
+                var hashkey=document.getElementById('hashkey');
+                var newhashkey=document.createElement("i");
+                newhashkey.innerHTML="<input id='hashkey' name='hashkey' type='hidden' value="+data.hashkey+" >";
+                hashkey.parentNode.replaceChild(newhashkey,hashkey);
+
+                var code_img=document.getElementById('code_img');
+                var newcode_img=document.createElement("j");
+                newcode_img.innerHTML="<img id='code_img' class='weui-vcode-img' src="+ data.imgage_url+" width='120' height='40' onclick='change_hash()'>";
+                code_img.parentNode.replaceChild(newcode_img,code_img);
+    
+    }   
+    })
+    };
+  </script>
+{% endblock %}
+

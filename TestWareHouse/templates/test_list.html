@@ -1,0 +1,105 @@
+﻿{% extends 'base.html' %}
+{% block title%}
+<div class="col-md-6 ">
+        <h2>试题题库</h2>
+
+    </div>
+{% endblock %}
+{%block content%}
+    <div class="container page-body">
+
+        <div class="col-md-1 " role="main">
+            <h5><a href="{% url 'test' %}">做题入口</a></h5>
+            </div>
+        <div class="col-md-9 col-md-offset-2" role="main">
+
+            <div class="panel panel-default">
+  <div class="panel-heading"><h4>题库筛选</h4></div>
+  <div class="panel-body">
+ <select id="subject" onchange="change()" name="subject">
+            <option value="" disabled selected hidden>--请选择知识方向(默认全部)--</option>
+                <option value="">全选</option>
+            {#<option value="all">all</option>#}
+                {% for i in subject_list %}
+            <option value="{{i.id}}"  {% if i.id == subject_re %}selected {% endif %}>{{i.subject}}</option>
+                {% endfor %}
+            </select>
+
+            <select id="point" name="point" onchange="change()">
+            <option value="" disabled selected hidden>--请选择知识点(默认全部)--</option>
+                <option value="">全选</option>
+            {#<option value="all">all</option>#}
+                {% for i in point_list %}
+            <option value="{{i}}" {% if i == point_re %}selected {% endif %}>{{i}}</option>
+                {% endfor %}
+            {#<option value="all">all</option>#}
+            </select>
+
+            <select id="difficulty" name="difficulty" onchange="change()">
+                <option value="" disabled selected hidden>--请选择难度(默认全部)--</option>
+            <option value="1" {% if   difficulty_re == '1'  %}selected {% endif %}>简单</option>
+            <option value="2" {% if   difficulty_re == '2'  %}selected {% endif %}>中等</option>
+            <option value="3" {% if   difficulty_re == '3'  %}selected {% endif %}>困难</option>
+            </select>
+  </div>
+</div>
+           
+
+            <div>
+                {% for i in test_list.object_list %}
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                         <div style='float: left;'>
+                        <ul class="pagination">
+                            <li class="active"><a href="#" id="id">{{i.0|add:1}}<span class="sr-only">(current)</span></a></li>        
+                            </ul>
+                            </div>
+                        <div style='float: right;width:90%;'>
+                    <h5>总题号：{{i.1.id}}</h5>  
+                    <a href="javascript:void(0);" onclick="jump({{i.0}})"> {% if i.1.desc|striptags|length > 5 %}{{i.1.desc|striptags|truncatewords:"5"}}....{% else %}{{i.1.desc|striptags}}{% endif %}</a><br/><br/>
+                    <p>难度：
+                        {% if i.1.difficulty == '1' %}
+                        <font color="green">
+                        {% elif i.1.difficulty == '2' %}
+                        <font color="yellow">
+                        {% elif i.1.difficulty == '3' %}
+                        <font color="red">
+                            {% endif %}
+                        {{i.1.get_difficulty_display}}</font></p>
+                    <p><b>知识点：{{i.1.subject_point}}</b></p>
+                            </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div id="pagination">
+                {{test_list.render}}
+
+            </div>
+            </div>
+</div>
+{% endblock %}
+
+{% block js_block%}
+
+<script>
+
+    function change() {
+        var subject = document.getElementById("subject").value;
+        var point = document.getElementById("point").value;
+        var difficulty = document.getElementById("difficulty").value;
+        var window_url=window.location.href .replace(/\?.*/,'')
+        var url = window_url+"?" + "subject=" + subject + "&" + "point=" + point + "&" + "difficulty=" + difficulty;
+        window.open(url, "_self")
+    }
+
+    function jump(id) {
+        var subject = document.getElementById("subject").value;
+        var point = document.getElementById("point").value;
+        var difficulty = document.getElementById("difficulty").value;
+        var window_url = window.location.href.replace(/\?.*/, '');
+        var url = window_url+"?" + "subject=" + subject + "&" + "point=" + point + "&" + "difficulty=" + difficulty+"&"+"id="+id;
+        window.open(url, "_self")
+    }
+  </script>
+{% endblock %}

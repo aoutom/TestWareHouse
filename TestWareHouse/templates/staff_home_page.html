@@ -1,0 +1,46 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="container page-body">
+<div class="col-md-2 col-md-offset-1" role="main">
+    <ul class="list-group">
+  <li class="list-group-item" style="color:darkmagenta">提交审核</li>
+  <li class="list-group-item">异议审核</li>
+</ul>
+</div>
+
+ <div class="col-md-5 col-md-offset-1" role="main">
+        <div>
+                {% for i in test_list.object_list %}
+                <div>
+                    <p>{{i.id}}</p>
+                    <a href="javascript:void(0);" onclick="jump({{i.id}})"> {{i.desc|truncatewords:20}}</a>
+                    <p>{{i.add_time}}</p>
+                    <p>{{i.subject_point}}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div id="pagination">
+                {{test_list.render}}
+
+            </div>
+
+</div>
+
+       </div>
+
+
+
+{% endblock %}
+
+{% block js_block%}
+<script>
+
+    function jump(id) {
+        var window_url=window.location.href .replace(/\?.*/,'');
+        var url = window_url+"staff_test_detail"+"?"+"id="+id;
+        window.open(url, "_self")
+    }
+
+  </script>
+{% endblock %}

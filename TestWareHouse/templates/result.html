@@ -1,0 +1,163 @@
+﻿{% extends 'base.html' %}
+
+
+
+{%block content%}
+
+    <div class="container page-body">
+        <div class="col-md-9 col-md-offset-2" role="main">
+            <div name="a" id="a1" style="width:500px;">
+            <h2>正确题数:{{score}}</h2>
+                <p>正确题号：</p>
+                <p>{% for i in exam %}{% if i.0.7 == 1%}{{forloop.counter}}  {% endif %}{%endfor %}</p>
+                <p>错误题号：</p>
+                <p>{% for i in exam %}{% if i.0.7 == 0%}{{forloop.counter}}  {% endif %}{%endfor %}</p>
+                </div>
+    {% for i in exam %}
+
+     <div name="a" id="a1" style="width:500px;display:none">
+
+        {% if i.0.7 == 1%}
+        <p>正确</p>
+        {% else %}
+        <p>错误</p>
+        {% endif %}
+        <p>{{i.0.1}}</p>
+        {% if i.0.0 == '1' %}
+            {% for j in i.0.4%}
+                            <p>{{j.0}}：{{j.1}}</p>
+            {% endfor%}
+        <p>你的答案：{% for m in i.0.6 %}{{m}}  {%endfor %}</p>
+        <p>正确答案：{% for m in i.0.2 %}{{m}}  {%endfor %}</p>
+        <p>解析：</p>
+        {{i.0.3|safe }}
+        {% elif i.0.0 == '2' %}
+            {% for j in i.0.4%}
+                            <p>{{j.0}}：{{j.1}}</p>
+            {% endfor%}
+        <p>你的答案：{% for m in i.0.6%}{{m}}  {%endfor %}</p>
+        <p>正确答案：{% for m in i.0.2%}{{m}}  {%endfor %}</p>
+        <p>解析：</p>
+        {{i.0.3|safe }}
+        {% elif i.0.0 == '3' %}
+            {% for j in i.0.4%}
+                            <p>{{j.0}}：{{j.1}}</p>
+            {% endfor%}
+        <p>你的答案：{% for m in i.0.6%}{{m}}  {%endfor %}</p>
+        <p>正确答案：{% for m in i.0.2%}{{m}}  {%endfor %}</p>
+        <p>解析：</p>
+        {{i.0.3|safe }}
+        {% elif i.0.0 == '4' %}
+
+        <p>你的答案：{% for m in i.0.6%}{{m}}  {%endfor %}</p>
+        <p>正确答案：</p>
+            {% for j in i.0.4%}
+                            <p>{{j}} 其中之一</p>
+            {% endfor%}
+        <p>解析：</p>
+        {{i.0.3|safe }}
+        {% endif %}
+    <p></p>
+         {% if request.user.is_authenticated%}
+         <p>{% if i.1 == 1%} <button onclick="delete_favourite({{i.0.5}})" id="delete_favourite">已收藏</button>{%else%}<button onclick="add_favourite({{i.0.5}})" id="add_favourite">未收藏</button>{%endif%}</p>
+         {% endif %}
+    </div>
+{% endfor %}
+    
+
+    <nav aria-label="Page navigation">
+  <ul class="pagination">
+
+      <li class="active" name="tage"><a href="javascript:void(0);" id="but1" onclick="h(0)">总评</a></li>
+      {% for i in exam%}
+      {% if i.0.7 == 1%}
+    <li name="tage"><a href="javascript:void(0);" id="but1" onclick="h({{forloop.counter}})" style="color:green;">{{forloop.counter}}</a></li>
+      {% else %}
+      <li name="tage"><a href="javascript:void(0);" id="but1" onclick="h({{forloop.counter}})" style="color:red;">{{forloop.counter}}</a></li>
+      {% endif %}
+      {% endfor %}
+
+  </ul>
+</nav>
+
+
+    
+
+</div>
+            </div>
+           
+{% endblock %}
+
+
+{% block js_block%}
+       <script type="text/javascript">
+            function h(idt){
+
+                var x = document.getElementsByName("a");
+                for(var i=0;i<x.length;i++) {
+                    x[i].style.display = "none";
+                }
+                x[idt].style.display = "";
+
+                           var x = document.getElementsByName("tag");
+                for (var i = 0; i < x.length; i++) {
+                    var y = document.getElementsByName("t" + i);
+                    x[i].className = "";
+                }
+                x[idt].className = "active";
+           }
+
+        function delete_favourite(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxfavouritetest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id, type:"delete_favourite"},
+                async: true,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('delete_favourite');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<button onclick='add_favourite("+data.id+");' id='add_favourite'>未收藏</button>";
+                         m.parentNode.replaceChild(newNode,m);
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+    }
+
+        function add_favourite(test_id) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "{% url 'ajaxfavouritetest' %}",
+                data: {'user_id': {{request.user.id}}, 'test_id': test_id, type:"add_favourite"},
+                async: true,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function (data) {
+                    if (data.res == 1) {
+                        var m=document.getElementById('add_favourite');
+                        var newNode=document.createElement("i");
+                        newNode.innerHTML="<button onclick='delete_favourite("+data.id+");' id='delete_favourite'>已收藏</button>";
+                         m.parentNode.replaceChild(newNode,m);
+
+
+                    } else {
+                        alert("失败")
+                    }
+                },
+            });
+
+    }
+    </script>
+
+{% endblock %}
+
